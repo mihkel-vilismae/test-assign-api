@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   php:
-    image: php:8.1-fpm-alpine
+    image: php:8.2-fpm-alpine
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html:cached
@@ -11,7 +11,8 @@ services:
       - "9000:9000"
     environment:
       - APP_ENV=dev # Or prod for production
-      - DATABASE_URL=mysql://db_user:db_password@database:3306/db_name?serverVersion=8.0&charset=utf8mb4 # MySQL connection string
+      - DATABASE_URL="mysql://root:rootpw@127.0.0.1:3306/assignment"
+      #- DATABASE_URL=mysql://db_user:db_password@database:3306/db_name?serverVersion=8.0&charset=utf8mb4 # MySQL connection string
       # Add other environment variables as needed
 
   nginx:
@@ -27,14 +28,20 @@ services:
   database:
     image: mysql:8.0 # Use a specific MySQL version
     environment:
-      - MYSQL_ROOT_PASSWORD=root_password # Set the root password (important!)
-      - MYSQL_DATABASE=db_name
-      - MYSQL_USER=db_user
-      - MYSQL_PASSWORD=db_password
+      - MYSQL_ROOT_PASSWORD=rootpw # Set the root password (important!)
+      - MYSQL_DATABASE=assignment
     volumes:
       - db_data:/var/lib/mysql # Persist database data
     ports:
       - "3306:3306" # Expose MySQL port (optional)
 
+  react:
+      build:
+        context: ../frontend/
+      ports:
+        - "3000:80"
+      depends_on:
+        - php
+        - database
 volumes:
   db_data:

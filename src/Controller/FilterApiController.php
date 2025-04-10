@@ -22,7 +22,7 @@ class FilterApiController extends AbstractController
         $filters = $entityManager->getRepository(Filter::class)->findAll();
         $jsonData = $serializer->serialize($filters, 'json', ['groups' => ['filter_with_criteria']]);
         $response = new JsonResponse($jsonData, Response::HTTP_OK, [], true);
-        $response->headers->set('Access-Control-Allow-Origin', 'http://127.0.0.1:3001'); // Or your frontend URL
+        $response->headers->set('Access-Control-Allow-Origin', 'http://127.0.0.1:3000'); // Or your frontend URL
         $response->headers->set('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
         $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Add other headers as needed
         return $response;
