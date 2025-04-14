@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('/api/filters')]
 class FilterApiController extends AbstractController
 {
-    #[Route('', name: 'api_filters_index', methods: ['GET'])]
+    #[Route('/get', name: 'api_filters_index', methods: ['GET','OPTIONS'])]
     public function index(EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         $filters = $entityManager->getRepository(Filter::class)->findAll();
@@ -23,18 +23,19 @@ class FilterApiController extends AbstractController
         $serializedFilters = $serializer->serialize($filters, 'json', ['groups' => ['filter_read']]);
 
         $response = new JsonResponse($serializedFilters, Response::HTTP_OK, [], true);
-        $response->headers->set('Access-Control-Allow-Origin', 'http://127.0.0.1:3000'); // Or your frontend URL
-        $response->headers->set('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Add other headers as needed
-        return $response;
+        return $this->setResponseHeaders($response);
     }
 
-    #[Route('/create', name: 'api_filters_create', methods: ['POST'])]
+
+    // create function that give sqiare root
+    #[Route('/create', name: 'api_filters_create', methods: ['POST','OPTIONS'])]
     public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
+        if ($request->isMethod('OPTIONS')) {
+            return $this->getOptionsResponse();
+        }
         try {
             $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
             $filter = new Filter();
             $filter->setName($data['name']);
             $filter->setSelection($data['selection'] ?? null);
@@ -52,7 +53,10 @@ class FilterApiController extends AbstractController
 
             $serializedFilter = $serializer->serialize($filter, 'json', ['groups' => ['filter_read']]);
 
-            return new JsonResponse($serializedFilter, Response::HTTP_CREATED, [], true);
+            $response = new JsonResponse($serializedFilter, Response::HTTP_CREATED, ['Access-Control-Allow-Origin'=>'*'], true);
+           // $response->headers->set('Access-Control-Allow-Origin', '*'); // Or your frontend URL
+
+            return $response;
 
         } catch (\JsonException $e) {
             return new JsonResponse(['error' => 'Invalid JSON format: ' . $e->getMessage()], Response::HTTP_BAD_REQUEST);
@@ -61,16 +65,19 @@ class FilterApiController extends AbstractController
         }
     }
 
-    #[Route('/{id}', name: 'api_filters_show', methods: ['GET'])]
+    /*#[Route('/{id}', name: 'api_filters_show', methods: ['GET'])]
     public function show(Filter $filter, SerializerInterface $serializer): JsonResponse
     {
         $serializedFilter = $serializer->serialize($filter, 'json', ['groups' => ['filter_read']]);
         return new JsonResponse($serializedFilter, Response::HTTP_OK, [], true);
-    }
+    }*/
 
-    #[Route('/{id}/edit', name: 'api_filters_edit', methods: ['PUT'])]
+    #[Route('/update/{id}', name: 'api_filters_edit', methods: ['PUT','OPTIONS'])]
     public function edit(Request $request, Filter $filter, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
+        if ($request->isMethod('OPTIONS')) {
+            return $this->getOptionsResponse();
+        }
         try {
             $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -89,11 +96,10 @@ class FilterApiController extends AbstractController
                 $criterion->setValue($criterionData['value']);
                 $filter->addCriterion($criterion);
             }
-
             $entityManager->flush();
 
             $serializedFilter = $serializer->serialize($filter, 'json', ['groups' => ['filter_read']]);
-            return new JsonResponse($serializedFilter, Response::HTTP_OK, [], true);
+            return $this->setResponseHeaders(new JsonResponse($serializedFilter, Response::HTTP_OK, ['Access-Control-Allow-Origin'=>'*'], true));
 
         } catch (\JsonException $e) {
             return new JsonResponse(['error' => 'Invalid JSON format: ' . $e->getMessage()], Response::HTTP_BAD_REQUEST);
@@ -102,11 +108,37 @@ class FilterApiController extends AbstractController
         }
     }
 
-    #[Route('/{id}', name: 'api_filters_delete', methods: ['DELETE'])]
-    public function delete(Filter $filter, EntityManagerInterface $entityManager): JsonResponse
+    #[Route('/delete/{id}', name: 'api_filters_delete', methods: ['DELETE', 'OPTIONS'])]
+    public function delete(Request $request, Filter $filter, EntityManagerInterface $entityManager): JsonResponse
     {
+        if ($request->isMethod('OPTIONS')) {
+            return $this->getOptionsResponse();
+        }
         $entityManager->remove($filter);
         $entityManager->flush();
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return $this->setResponseHeaders(new JsonResponse([], Response::HTTP_NO_CONTENT));
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    function getOptionsResponse(): JsonResponse
+    {
+        $response = new JsonResponse();
+        $response->headers->set('Access-Control-Allow-Origin', 'http://127.0.0.1:3000'); // Replace with your allowed origin
+        $response->headers->set('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS'); // Allow POST and OPTIONS
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow necessary headers
+        $response->headers->set('Access-Control-Max-Age', '3600');
+        return $response; // Cache preflight for 1 hour
+    }
+
+    function setResponseHeaders(JsonResponse $response): JsonResponse
+    {
+        $response->headers->set('Access-Control-Allow-Origin', 'http://127.0.0.1:3000'); // Or your frontend URL
+        $response->headers->set('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Add other headers as needed
+        $response->headers->set('Access-Control-Max-Age', '3600');
+
+        return $response;
     }
 }
