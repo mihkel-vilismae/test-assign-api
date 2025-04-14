@@ -1,20 +1,25 @@
 <?php
-
 namespace App\Repository;
 
-use App\Entity\Criteria;
+use App\Entity\Criterion;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Criteria>
+ * @extends ServiceEntityRepository<Criterion>
+ *
+ * @method Criterion|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Criterion|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Criterion[]    findAll()
+ * @method Criterion[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CriteriaRepository extends ServiceEntityRepository
+class CriterionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Criteria::class);
+        parent::__construct($registry, Criterion::class);
     }
+
 
     //    /**
     //     * @return Criteria[] Returns an array of Criteria objects

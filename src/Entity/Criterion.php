@@ -1,55 +1,40 @@
 <?php
 
+// src/Entity/Criterion.php
 namespace App\Entity;
 
-use App\Repository\CriteriaRepository;
+use App\Repository\CriterionRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: CriteriaRepository::class)]
-class Criteria
+#[ORM\Entity(repositoryClass: CriterionRepository::class)]
+class Criterion
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['filter_with_criteria'])]
+    #[Groups(["filter_read"])]
     private ?int $id = null;
+
+    #[ORM\Column(length: 255)] // Adjust length as needed
+    #[Groups(["filter_read"])]
+    private ?string $type = null; // e.g., "field", "header", etc.
+
+    #[ORM\Column(length: 255)] // Adjust length as needed
+    #[Groups(["filter_read"])]
+    private ?string $comparator = null; // e.g., "=", "!=", ">", "<", etc.
+
+    #[ORM\Column(length: 255)] // Adjust length as needed, or use a different type if needed (e.g., TextType for longer values)
+    #[Groups(["filter_read"])]
+    private ?string $value = null;
 
     #[ORM\ManyToOne(inversedBy: 'criteria')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Filter $filter = null;
 
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
-    #[Groups(['filter_with_criteria'])]
-    private ?string $type = null;
-
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
-    #[Groups(['filter_with_criteria'])]
-    private ?string $comparator = null;
-
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
-    #[Groups(['filter_with_criteria'])]
-    private ?string $value = null;
-
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getFilter(): ?Filter
-    {
-        return $this->filter;
-    }
-
-    public function setFilter(?Filter $filter): self
-    {
-        $this->filter = $filter;
-
-        return $this;
     }
 
     public function getType(): ?string
@@ -87,4 +72,18 @@ class Criteria
 
         return $this;
     }
+
+    public function getFilter(): ?Filter
+    {
+        return $this->filter;
+    }
+
+    public function setFilter(?Filter $filter): self
+    {
+        $this->filter = $filter;
+
+        return $this;
+    }
 }
+
+// ... (Filter.php, FilterController.php, and Repositories remain the same - see previous response)

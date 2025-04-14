@@ -1,5 +1,5 @@
 <?php
-
+// src/Repository/FilterRepository.php
 namespace App\Repository;
 
 use App\Entity\Filter;
@@ -20,24 +20,8 @@ class FilterRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Filter::class);
     }
+    // ... add custom query methods here as needed
 
-    public function save(Filter $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(Filter $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
 
 //    /**
 //     * @return Filter[] Returns an array of Filter objects
