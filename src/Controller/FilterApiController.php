@@ -16,8 +16,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 class FilterApiController extends AbstractController
 {
     #[Route('/get', name: 'api_filters_index', methods: ['GET','OPTIONS'])]
-    public function index(EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    public function index(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
+        if ($request->isMethod('OPTIONS')) {
+            return $this->getOptionsResponse();
+        }
         $filters = $entityManager->getRepository(Filter::class)->findAll();
 
         $serializedFilters = $serializer->serialize($filters, 'json', ['groups' => ['filter_read']]);
@@ -125,7 +128,8 @@ class FilterApiController extends AbstractController
     function getOptionsResponse(): JsonResponse
     {
         $response = new JsonResponse();
-        $response->headers->set('Access-Control-Allow-Origin', 'http://127.0.0.1:3000'); // Replace with your allowed origin
+        $response->headers->set('Access-Control-Allow-Origin', 'http://localhost:3000/'); // Replace with your allowed origin
+        //$response->headers->set('Access-Control-Allow-Origin', 'http://127.0.0.1:3000'); // Replace with your allowed origin
         $response->headers->set('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS'); // Allow POST and OPTIONS
         $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow necessary headers
         $response->headers->set('Access-Control-Max-Age', '3600');
@@ -134,7 +138,8 @@ class FilterApiController extends AbstractController
 
     function setResponseHeaders(JsonResponse $response): JsonResponse
     {
-        $response->headers->set('Access-Control-Allow-Origin', 'http://127.0.0.1:3000'); // Or your frontend URL
+        $response->headers->set('Access-Control-Allow-Origin', 'http://localhost:3000/'); // Replace with your allowed origin
+#        $response->headers->set('Access-Control-Allow-Origin', 'http://127.0.0.1:3000'); // Or your frontend URL
         $response->headers->set('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
         $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Add other headers as needed
         $response->headers->set('Access-Control-Max-Age', '3600');

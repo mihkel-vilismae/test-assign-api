@@ -1,8 +1,9 @@
-version: '3.9'
-
 services:
   php:
-    image: php:8.2-fpm-alpine
+   #image: php:8.2-fpm-alpine
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html:cached
@@ -11,12 +12,14 @@ services:
       - "9000:9000"
     environment:
       - APP_ENV=dev # Or prod for production
-      - DATABASE_URL="mysql://root:rootpw@127.0.0.1:3306/assignment"
-      #- DATABASE_URL=mysql://db_user:db_password@database:3306/db_name?serverVersion=8.0&charset=utf8mb4 # MySQL connection string
-      # Add other environment variables as needed
+      - DATABASE_URL=mysql://root:rootpw@database:3306/assignment
+
 
   nginx:
-    image: nginx:latest
+    #image: nginx:latest
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
     ports:
       - "80:80"
     volumes:
