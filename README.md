@@ -1,11 +1,12 @@
+**NOTE:  ISSUES ACTIVELY BEING SOLVED.**
+Also: project is not Laravel as I mistakenly thought.
+
 - How to set up and run the project.
   - add --passwords_etc-- to .env
   - run migration command
   - run seed command
 
-
 - sudo docker compose up
-
 
 - API endpoints and their usage.
   - /api/filters/delete/{id}
@@ -27,3 +28,8 @@ php bin/console doctrine:fixtures:load
 sudo docker compose build --no-cache
 sudo docker compose up -d
 sudo docker exec -it ee123aebf60a  /bin/sh
+
+
+--
+
+
