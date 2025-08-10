@@ -1,6 +1,3 @@
-**NOTE:  ISSUES ACTIVELY BEING SOLVED.**
-Also: project is not Laravel as I mistakenly thought.
-
 - How to set up and run the project.
   - add --passwords_etc-- to .env
   - run migration command
